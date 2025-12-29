@@ -1,40 +1,27 @@
-"use client"; // Required for useState
-import { useState } from "react";
+"use client";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/app/redux/naviStore";
+import { setActiveOption } from "@/app/redux/naviSlice";
 
-export const NavigationBar = ({
-  options = ["Overview", "Analytics", "Settings"],
-}) => {
-  const [activeIndex, setActiveIndex] = useState<number | null>(0);
+export const NavigationBar = ({ options }: { options: string[] }) => {
+  const dispatch = useDispatch();
+  const activeOption = useSelector(
+    (state: RootState) => state.navigation.activeOption
+  );
 
   return (
-    <nav className="flex flex-col w-full h-full border-r bg-gray-50">
-      <div className="p-4 font-bold text-lg border-b text-center">
-        Task User Dashboard
-      </div>
-
-      <div className="flex flex-col flex-1 py-4 px-3 gap-y-5">
-        {options.map((option, index) => {
-          // 2. Check if this specific item is the active one
-          const isActive = activeIndex === index;
-
-          return (
-            <div
-              key={index}
-              onClick={() => setActiveIndex(index)}
-              className={`
-                px-3 py-2 text-lg font-medium cursor-pointer transition-colors rounded-md
-                ${
-                  isActive
-                    ? "bg-gray-200 text-black shadow-sm"
-                    : "text-gray-700 hover:bg-gray-100 hover:text-black"
-                }
-              `}
-            >
-              {option}
-            </div>
-          );
-        })}
-      </div>
-    </nav>
+    <div className="flex flex-col gap-2">
+      {options.map((option) => (
+        <button
+          key={option}
+          onClick={() => dispatch(setActiveOption(option))}
+          className={`p-2 text-left ${
+            activeOption === option ? "bg-gray-200" : ""
+          }`}
+        >
+          {option}
+        </button>
+      ))}
+    </div>
   );
 };
