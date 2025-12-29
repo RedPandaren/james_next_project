@@ -1,11 +1,9 @@
 "use client";
-import { AlertCircleIcon } from "lucide-react";
-import Image from "next/image";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -13,18 +11,32 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import "dotenv/config";
+
+import { useSearchParams } from "next/navigation";
+import { AlertFade } from "@/components/ui/reusable/alert";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { loginAction } from "../actions/auth";
 import { useEffect, useState } from "react";
+import { setLazyProp } from "next/dist/server/api-utils";
 
 export default function Page() {
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const messageParam = searchParams.get("message");
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
+    if (messageParam === "registered") {
+      setSuccess("Account Registered Successfully!");
+
+      // Auto-hide after 2 seconds
+      const timer = setTimeout(() => setSuccess(null), 3000);
+      return () => clearTimeout(timer);
+    }
     if (error) {
       const timer = setTimeout(() => {
         setError(null);
@@ -32,15 +44,13 @@ export default function Page() {
 
       return () => clearTimeout(timer);
     }
-  }, [error]);
+  }, [error, messageParam]);
 
-  async function handleSubmit(formData: FormData) {
+  async function handleLoginSubmit(formData: FormData) {
     const result = await loginAction(formData);
-    console.log(error);
+    console.log(result?.error);
     if (result?.error) {
-      if (result?.error) {
-        setError(result.error);
-      }
+      setError(result.error);
     }
   }
 
@@ -54,17 +64,8 @@ export default function Page() {
       </div>
 
       <div className="flex items-center justify-center border w-1/3 h-full">
-        {error && (
-          <div className="fixed top-4 left-0 right-0 z-00 flex justify-center px-4 pointer-events-none">
-            <Alert
-              variant="destructive"
-              className="w-full max-w-md shadow-lg animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto"
-            >
-              <AlertCircleIcon className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          </div>
-        )}
+        {error && AlertFade(error, true)}
+        {success && AlertFade(success)}
         <Card className="w-full max-w-sm">
           <CardHeader>
             <CardTitle>Login to your account</CardTitle>
@@ -74,10 +75,10 @@ export default function Page() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form action={handleSubmit}>
+            <form action={handleLoginSubmit}>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label>Username</Label>
                   <Input
                     name="email"
                     id="email"
@@ -110,8 +111,8 @@ export default function Page() {
             </form>
           </CardContent>
           <CardFooter className="flex-col">
-            <Button variant="outline" className="w-full">
-              Register
+            <Button variant="outline" className="w-full" asChild>
+              <Link href="/register">Register</Link>
             </Button>
           </CardFooter>
         </Card>
