@@ -32,3 +32,29 @@ export async function loginAction(formData: FormData) {
 
   redirect("/dashboard");
 }
+
+export async function getSessionUser() {
+  const cookieStore = await cookies();
+  const userId = cookieStore.get("session")?.value;
+
+  if (!userId) return redirect("/login?message=authInvalid");
+
+  try {
+    const user = await db.users.findUnique({
+      where: { id: userId },
+
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role_id: true,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.log(error);
+
+    return null;
+  }
+}

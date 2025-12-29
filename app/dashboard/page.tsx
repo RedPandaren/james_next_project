@@ -1,15 +1,23 @@
-import { ComponentExample } from "@/components/component-example";
-import { NavigationBar } from "@/components/dashboard/navigation";
+// app/dashboard/page.tsx
+"use client";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/naviStore";
+import TaskView from "./views/tasks/TaskView";
+
 export default function Page() {
-  return (
-    <div className="border 5 flex flex-row h-screen w-screen">
-      <div className="border 5 w-1/7 h-full">
-        <div className="border-b-2 h-15 flex items-center justify-center">
-          <span>User Dashboard</span>
-        </div>
-        <NavigationBar options={["Team", "Tasks", "Settings"]} />
-      </div>
-      <div className="border 5 w-3/5 h-full"> test</div>
-    </div>
+  const activeOption = useSelector(
+    (state: RootState) => state.navigation.activeOption
   );
+
+  const renderContent = () => {
+    switch (activeOption) {
+      case "Tasks":
+        return <TaskView />;
+
+      default:
+        return <div> no action selected</div>;
+    }
+  };
+
+  return renderContent();
 }

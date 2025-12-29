@@ -5,18 +5,19 @@ import { setActiveOption } from "@/app/redux/naviSlice";
 
 export const NavigationBar = ({ options }: { options: string[] }) => {
   const dispatch = useDispatch();
+
   const activeOption = useSelector(
     (state: RootState) => state.navigation.activeOption
   );
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col items-center">
       {options.map((option) => (
         <button
           key={option}
           onClick={() => dispatch(setActiveOption(option))}
-          className={`p-2 text-left ${
-            activeOption === option ? "bg-gray-200" : ""
+          className={`p-5 text-2xl hover:bg-gray-400 w-full text-left ${
+            activeOption === option ? "bg-gray-400" : ""
           }`}
         >
           {option}
