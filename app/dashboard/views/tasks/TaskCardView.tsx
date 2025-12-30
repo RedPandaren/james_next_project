@@ -15,11 +15,10 @@ export default function TaskCardView({ task, onClose }: TaskCardViewProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Local state for the form fields
   const [formData, setFormData] = useState({
     title: task.title,
     description: task.description || "",
-    // Cast the initial status to the Prisma enum type
+
     status: (task.status as task_status) || "todo",
     priority: task.priority,
   });
@@ -38,11 +37,10 @@ export default function TaskCardView({ task, onClose }: TaskCardViewProps) {
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Pass the formData to your server action
       await updateUserTask(task.id, formData);
 
       setIsEditing(false);
-      router.refresh(); // Refreshes the server components to show new data
+      router.refresh();
     } catch (error) {
       console.error("Failed to save:", error);
     } finally {

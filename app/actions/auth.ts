@@ -23,16 +23,19 @@ export async function loginAction(formData: FormData) {
     return { error: "Invalid email or password" };
   }
 
+  const FIVE_MINUTES = 5 * 60;
+
   const cookieStore = await cookies();
   cookieStore.set("session", user.id, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     path: "/",
+    maxAge: FIVE_MINUTES,
+    sameSite: "lax",
   });
 
   redirect("/dashboard");
 }
-
 export async function getSessionUser() {
   const cookieStore = await cookies();
   const userId = cookieStore.get("session")?.value;
