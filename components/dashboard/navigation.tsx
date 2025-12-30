@@ -16,7 +16,7 @@ export const NavigationBar = ({ options }: { options: string[] }) => {
         <button
           key={option}
           onClick={() => dispatch(setActiveOption(option))}
-          className={`p-5 text-2xl hover:bg-gray-400 w-full text-left ${
+          className={`p-5  hover:bg-gray-400 w-full text-left ${
             activeOption === option ? "bg-gray-400" : ""
           }`}
         >

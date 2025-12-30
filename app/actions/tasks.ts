@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { getSessionUser } from "./auth";
+import { tasks } from "@prisma/client";
 
 export async function createTask(formData: FormData) {
   const user = await getSessionUser();
@@ -65,4 +66,31 @@ export async function getUserTask(sortBy: string | "created_at") {
   if (!tasks || tasks.length === 0) return { error: "No tasks found" };
 
   return tasks;
+}
+
+export async function updateUserTask(task_id: string, task: tasks) {
+  const user = await getSessionUser();
+
+  if (!user || !user.id) {
+    return { error: "User not authenticated" };
+  }
+
+  try {
+    const updatedTask = await db.tasks.update({
+      where: {
+        id: task_id,
+      },
+      data: {
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        priority: task.priority,
+      },
+    });
+
+    return updatedTask;
+  } catch (error) {
+    console.error("Failed to update task:", error);
+    return { error: "Failed to update task in database" };
+  }
 }
