@@ -1,26 +1,23 @@
 // app/dashboard/layout.tsx
 import { NavigationBar } from "@/components/dashboard/navigation";
-import { getSessionUser } from "../actions/auth";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = getSessionUser();
-
   return (
     <div className="flex flex-row h-screen w-full overflow-hidden">
-      <aside className="w-64 border-r flex flex-col bg-gray-50">
-        <div className="border-b h-38  flex items-center justify-center text-2xl font-bold text-gray-800">
+      <aside className="w-64 bg-slate-900 text-white flex flex-col">
+        <div className="border-b h-23  flex items-center justify-center text-2xl font-bold text-white">
           User Dashboard
         </div>
         <div className="flex-1 overflow-y-auto">
-          <NavigationBar options={["Team", "Tasks", "Settings"]} />
+          <NavigationBar options={["Teams", "Tasks", "Settings"]} />
         </div>
       </aside>
 
-      <main className="flex-1 h-full overflow-y-auto bg-white border-1">
+      <main className="flex-1 h-full overflow-y-auto bg-white border ">
         {children}
       </main>
     </div>

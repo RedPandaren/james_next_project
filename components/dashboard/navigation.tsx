@@ -11,18 +11,20 @@ export const NavigationBar = ({ options }: { options: string[] }) => {
   );
 
   return (
-    <div className="flex flex-col items-center">
-      {options.map((option) => (
-        <button
-          key={option}
-          onClick={() => dispatch(setActiveOption(option))}
-          className={`p-5  hover:bg-gray-400 w-full text-left ${
-            activeOption === option ? "bg-gray-400" : ""
-          }`}
-        >
-          {option}
-        </button>
-      ))}
+    <div className="flex flex-col items-center mt-4">
+      <div className="flex flex-col p-5 gap-4 w-full overflow-y-auto">
+        {options.map((option) => (
+          <button
+            key={option}
+            onClick={() => dispatch(setActiveOption(option))}
+            className={`p-3 rounded-xl hover:bg-indigo-700 transition-colors w-full text-left ${
+              activeOption === option ? "bg-indigo-700" : ""
+            }`}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import TaskList from "./TaskList";
 import CreateTaskModal from "./TaskCreate";
+import { Plus } from "lucide-react";
 
 export default function TaskView() {
   const [sortBy, setSortBy] = useState("priority");
@@ -19,12 +20,11 @@ export default function TaskView() {
         </div>
 
         <button
-          onClick={() => {
-            setIsModalOpen(true);
-          }}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md active:scale-95"
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-md active:scale-95"
         >
-          <span>+ Create Task</span>
+          <Plus size={20} strokeWidth={3} />
+          Create Task
         </button>
       </header>
 
