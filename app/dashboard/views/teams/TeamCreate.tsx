@@ -9,18 +9,31 @@ interface TeamCreateProps {
 export default function TeamCreate({ onClose, onSuccess }: TeamCreateProps) {
   const [teamName, setTeamName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!teamName.trim()) return;
 
     setLoading(true);
+    setError(""); // Clear any previous errors
+
     try {
-      const addTeam = await createTeam(teamName);
-      onSuccess();
-      onClose();
+      const response = await createTeam(teamName);
+
+      if (response.error) {
+        setError(response.error);
+        return;
+      }
+
+      if (response.success) {
+        // Team created successfully, refresh the teams list
+        onSuccess();
+        onClose();
+      }
     } catch (error) {
       console.error("Failed to create team:", error);
+      setError("Failed to create team. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -47,6 +60,11 @@ export default function TeamCreate({ onClose, onSuccess }: TeamCreateProps) {
         </div>
 
         <form className="px-8 pb-8 space-y-5" onSubmit={handleSubmit}>
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-medium">
+              {error}
+            </div>
+          )}
           <div className="space-y-1.5">
             <label className="text-sm font-bold text-slate-700 ml-1">
               Team name
