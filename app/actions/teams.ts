@@ -10,8 +10,7 @@ export async function createTeam(teamName: string) {
 
   const task = await db.teams.create({
     data: {
-      team_name: teamName,
-      owner_user_id: userId,
+      name: teamName,
     },
   });
 
@@ -31,7 +30,15 @@ export async function getTeam() {
 
   const task = await db.teams.findMany({
     where: {
-      owner_user_id: userId,
+      userteams: {
+        some: {
+          user_id: userId,
+        },
+      },
+    },
+    include: {
+      // teams: true,
+      userteams: true,
     },
   });
 

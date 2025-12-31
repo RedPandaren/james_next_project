@@ -1,6 +1,6 @@
 "use client";
 
-import { getUserTask } from "@/app/actions/tasks";
+import { getUserTasks } from "@/app/actions/tasks";
 import { RootState } from "@/app/redux/naviStore";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -24,7 +24,7 @@ export default function TaskList({ sortBy }: TaskListProps) {
   useEffect(() => {
     const fetchTasks = async () => {
       setError(null);
-      const result = await getUserTask(sortBy);
+      const result = await getUserTasks(sortBy);
       if (result && "error" in result) {
         setError(result.error);
         setTaskList([]);

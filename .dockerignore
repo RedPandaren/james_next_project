@@ -1,0 +1,13 @@
+.next
+node_modules
+npm-debug.log
+.env
+dist
+build
+.git
+.husky
+coverage
+/.vscode
+Dockerfile
+docker-compose.yaml
+docker-composer.yaml

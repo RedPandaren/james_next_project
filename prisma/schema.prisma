@@ -12,47 +12,81 @@ model roles {
   name        role_name @unique
   description String?
   created_at  DateTime? @default(now()) @db.Timestamptz(6)
-  users       users[]
 }
 
 model users {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  username   String    @db.VarChar(20)
-  email      String    @unique
-  role_id    Int
-  created_at DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at DateTime? @default(now()) @db.Timestamptz(6)
-  password   String    @db.VarChar(255)
+  id         Int         @id @default(autoincrement())
+  name       String      @db.VarChar(255)
+  email      String      @unique @db.VarChar(255)
+  password   String      @db.VarChar(255)
+  status     String?     @default("active") @db.VarChar(50)
+  created_at DateTime?   @default(now()) @db.Timestamptz(6)
+  updated_at DateTime?   @default(now()) @db.Timestamptz(6)
+  comments   comments[]
   tasks      tasks[]
-  teams      teams[]
-  roles      roles     @relation(fields: [role_id], references: [id], onUpdate: NoAction, map: "fk_role")
-
-  @@index([email], map: "idx_users_email")
-  @@index([role_id], map: "idx_users_role_id")
+  usertasks  usertasks[]
+  userteams  userteams[]
 }
 
 model tasks {
-  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title       String
+  id          Int         @id @default(autoincrement())
+  team_id     Int?
+  title       String      @db.VarChar(255)
   description String?
-  status      task_status? @default(todo)
-  assigned_to String?      @db.Uuid
-  team_id     String?      @db.Uuid
+  status      String?     @default("todo") @db.VarChar(50)
   priority    Boolean?
-  due_date    DateTime?    @db.Timestamp(6)
-  created_at  DateTime?    @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime?    @default(now()) @db.Timestamptz(6)
-  users       users?       @relation(fields: [assigned_to], references: [id], onUpdate: NoAction, map: "fk_assigned_user")
-  teams       teams?       @relation(fields: [team_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_team")
+  due_date    DateTime?   @db.Date
+  created_by  Int?
+  created_at  DateTime?   @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime?   @default(now()) @db.Timestamptz(6)
+  comments    comments[]
+  users       users?      @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  teams       teams?      @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_team")
+  usertasks   usertasks[]
 }
 
 model teams {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  team_name     String
-  created_at    DateTime? @default(now()) @db.Timestamptz(6)
-  owner_user_id String?   @db.Uuid
-  tasks         tasks[]
-  users         users?    @relation(fields: [owner_user_id], references: [id], onUpdate: NoAction, map: "fk_owner")
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(255)
+  description String?
+  created_at  DateTime?   @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime?   @default(now()) @db.Timestamptz(6)
+  tasks       tasks[]
+  userteams   userteams[]
+}
+
+model comments {
+  id         Int       @id @default(autoincrement())
+  task_id    Int
+  user_id    Int?
+  text       String
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  tasks      tasks     @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model usertasks {
+  id          Int       @id @default(autoincrement())
+  task_id     Int
+  user_id     Int
+  role        String    @db.VarChar(100)
+  assigned_at DateTime? @default(now()) @db.Timestamptz(6)
+  tasks       tasks     @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users       users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([task_id, user_id])
+}
+
+model userteams {
+  id        Int       @id @default(autoincrement())
+  user_id   Int
+  team_id   Int
+  role      String    @db.VarChar(100)
+  joined_at DateTime? @default(now()) @db.Timestamptz(6)
+  teams     teams     @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users     users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([user_id, team_id])
 }
 
 enum role_name {
@@ -60,11 +94,4 @@ enum role_name {
   ADMIN
   MEMBER
   VIEWER
-}
-
-enum task_status {
-  todo
-  in_progress
-  review
-  done
 }

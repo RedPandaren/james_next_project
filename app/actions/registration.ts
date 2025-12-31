@@ -29,8 +29,7 @@ export async function registerAction(formData: FormData) {
     data: {
       email,
       password: hashedPassword,
-      username,
-      role_id: 4,
+      name: username,
     },
   });
 

@@ -26,7 +26,7 @@ export async function loginAction(formData: FormData) {
   const FIVE_MINUTES = 5 * 60;
 
   const cookieStore = await cookies();
-  cookieStore.set("session", user.id, {
+  cookieStore.set("session", user.id.toString(), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     path: "/",
@@ -44,13 +44,11 @@ export async function getSessionUser() {
 
   try {
     const user = await db.users.findUnique({
-      where: { id: userId },
+      where: { id: parseInt(userId) },
 
       select: {
         id: true,
-        username: true,
         email: true,
-        role_id: true,
       },
     });
 
