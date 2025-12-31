@@ -1,7 +1,7 @@
 "use client";
 
 import { updateUserTask } from "@/app/actions/tasks";
-import { tasks, task_status } from "@prisma/client"; // Added task_status import
+import { tasks } from "@prisma/client"; // Added task_status import
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -19,7 +19,7 @@ export default function TaskCardView({ task, onClose }: TaskCardViewProps) {
     title: task.title,
     description: task.description || "",
 
-    status: (task.status as task_status) || "todo",
+    status: task.status || "todo",
     priority: task.priority,
   });
 
@@ -73,7 +73,7 @@ export default function TaskCardView({ task, onClose }: TaskCardViewProps) {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    status: e.target.value as task_status,
+                    status: e.target.value,
                   })
                 }
                 className="text-xs font-bold border rounded-md px-2 py-1 outline-indigo-500 bg-white"
@@ -142,7 +142,7 @@ export default function TaskCardView({ task, onClose }: TaskCardViewProps) {
                     <input
                       type="checkbox"
                       id="priority"
-                      checked={formData.priority}
+                      checked={formData.priority ?? false}
                       onChange={(e) =>
                         setFormData({ ...formData, priority: e.target.checked })
                       }

@@ -23,8 +23,6 @@ export default function Page() {
   const [success, setSuccess] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
-  // 1. EFFECT: Handle URL Message Capture & URL Cleanup
-  // This runs only ONCE when the component mounts
   useEffect(() => {
     const messageParam = searchParams.get("message");
     if (!messageParam) return;
@@ -35,7 +33,6 @@ export default function Page() {
       setError("Invalid Session, Please Login to Continue.");
     }
 
-    // Clean URL query params without refreshing the page
     const url = new URL(window.location.href);
     url.searchParams.delete("message");
     url.searchParams.delete("error");

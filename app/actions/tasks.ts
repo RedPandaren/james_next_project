@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { getSessionUser } from "./auth";
 import { tasks } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 export async function createTask(formData: FormData) {
   const user = await getSessionUser();
@@ -76,7 +77,10 @@ export async function getUserTasks(sortBy: string = "created_at") {
   return tasks;
 }
 
-export async function updateUserTask(task_id: string, task: tasks) {
+export async function updateUserTask(
+  task_id: number,
+  task: Prisma.tasksUpdateInput
+) {
   const user = await getSessionUser();
 
   if (!user || !user.id) {
@@ -86,7 +90,7 @@ export async function updateUserTask(task_id: string, task: tasks) {
   try {
     const updatedTask = await db.tasks.update({
       where: {
-        id: parseInt(task_id),
+        id: task_id,
       },
       data: {
         title: task.title,

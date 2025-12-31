@@ -58,11 +58,9 @@ export default function TeamView() {
                   </div>
                 </div>
                 <h3 className="text-lg font-bold text-slate-800 mb-1">
-                  {team.team_name}
+                  {team.name}
                 </h3>
-                <p className="text-sm text-slate-500 mb-6">
-                  {team.members} Members active
-                </p>
+                <p className="text-sm text-slate-500 mb-6">test test</p>
                 <button className="w-full py-2 bg-slate-50 text-slate-600 font-bold rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors">
                   View Team
                 </button>
