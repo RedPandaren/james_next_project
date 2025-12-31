@@ -26,7 +26,7 @@ export async function registerAction(formData: FormData) {
   const hashedPassword = await bcrypt.hash(password, 12);
 
   await db.users.create({
-    data: {
+    data: { 
       email,
       password: hashedPassword,
       name: username,

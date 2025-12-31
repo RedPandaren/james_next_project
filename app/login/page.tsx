@@ -16,9 +16,9 @@ import { AlertFade } from "@/components/ui/reusable/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginAction } from "../actions/auth";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-export default function Page() {
+function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -37,7 +37,7 @@ export default function Page() {
     url.searchParams.delete("message");
     url.searchParams.delete("error");
     window.history.replaceState({}, "", url.toString());
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     if (error) {
@@ -121,5 +121,19 @@ export default function Page() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-screen w-screen flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
