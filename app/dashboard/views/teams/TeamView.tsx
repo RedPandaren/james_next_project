@@ -1,29 +1,73 @@
-import React, { useEffect, useState } from "react";
-import { Plus, Users, X, Settings, Briefcase, Globe } from "lucide-react";
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  Plus,
+  Users,
+  X,
+  Settings,
+  Briefcase,
+  Globe,
+  Trash2,
+} from "lucide-react";
 import TeamCreate from "./TeamCreate";
 import { teams } from "@prisma/client";
-import { getTeam } from "@/app/actions/teams";
+import { getTeam, deleteTeam } from "@/app/actions/teams";
+import { AlertFade } from "@/components/ui/reusable/alert";
 
 export default function TeamView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teams, setTeams] = useState<teams[]>([]);
+  const [teamToDelete, setTeamToDelete] = useState<teams | null>(null);
+  const [deletingTeamId, setDeletingTeamId] = useState<number | null>(null);
 
-  const fetchTeams = async () => {
+  const handleDeleteTeam = async (team: teams) => {
+    setDeletingTeamId(team.id);
+    try {
+      const response = await deleteTeam(team.id);
+
+      if (response.error) {
+        AlertFade(response.error, "error");
+        return;
+      }
+
+      if (response.success) {
+        // Optimistic update: remove team from state immediately
+        setTeams((prevTeams) => prevTeams.filter((t) => t.id !== team.id));
+        AlertFade(`Team "${team.name}" deleted successfully`, "success");
+        setTeamToDelete(null);
+      }
+    } catch (error) {
+      console.error("Failed to delete team:", error);
+      AlertFade("Failed to delete team. Please try again.", "error");
+    } finally {
+      setDeletingTeamId(null);
+    }
+  };
+
+  const confirmDeleteTeam = (team: teams) => {
+    setTeamToDelete(team);
+  };
+
+  const cancelDelete = () => {
+    setTeamToDelete(null);
+  };
+
+  const fetchTeams = useCallback(async () => {
     try {
       const teams = await getTeam();
 
       if (!teams || "error" in teams) {
         return;
       }
-      setTeams(teams);
+      // Use setTimeout to avoid synchronous setState in effect
+      setTimeout(() => setTeams(teams), 0);
     } catch (error) {
       console.error("Error fetching teams:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchTeams();
-  }, []);
+  }, [fetchTeams]);
 
   return (
     <div className="flex h-screen w-full bg-gray-50 font-sans text-slate-900">
@@ -56,6 +100,14 @@ export default function TeamView() {
                   <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
                     <Users size={24} />
                   </div>
+                  <button
+                    onClick={() => confirmDeleteTeam(team)}
+                    disabled={deletingTeamId === team.id}
+                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                    title="Delete team"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
                 <h3 className="text-lg font-bold text-slate-800 mb-1">
                   {team.name}
@@ -83,6 +135,45 @@ export default function TeamView() {
           onClose={() => setIsModalOpen(false)}
           onSuccess={fetchTeams}
         />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {teamToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            onClick={cancelDelete}
+          />
+          <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+            <div className="px-8 pt-8 pb-6">
+              <h2 className="text-2xl font-black text-slate-800 tracking-tight mb-4">
+                Delete Team
+              </h2>
+              <p className="text-slate-600 mb-6">
+                Are you sure you want to delete{" "}
+                <strong>{`"${teamToDelete.name}"`}</strong>? This action cannot
+                be undone and will remove all team data.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelDelete}
+                  className="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDeleteTeam(teamToDelete)}
+                  disabled={deletingTeamId === teamToDelete.id}
+                  className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {deletingTeamId === teamToDelete.id
+                    ? "Deleting..."
+                    : "Delete Team"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
