@@ -12,7 +12,7 @@ export async function createTask(formData: FormData) {
 
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
-  const priority = formData.get("priority") as string; // 'low', 'medium', 'high'
+  const priority = formData.get("priority") === "true";
   const dueDateString = formData.get("due_date") as string;
   const due_date = dueDateString ? new Date(dueDateString) : null;
 
