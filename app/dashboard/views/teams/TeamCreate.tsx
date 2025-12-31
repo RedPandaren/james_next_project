@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import { createTeam } from "@/app/actions/teams";
 import { AlertFade } from "@/components/ui/reusable/alert";
+import { teams } from "@prisma/client";
 
 interface TeamCreateProps {
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (teamData?: teams) => void;
 }
 export default function TeamCreate({ onClose, onSuccess }: TeamCreateProps) {
   const [teamName, setTeamName] = useState("");
@@ -37,14 +38,15 @@ export default function TeamCreate({ onClose, onSuccess }: TeamCreateProps) {
         return;
       }
 
-      if (response.success) {
+      if (response.success && response.team) {
         // Team created successfully, show success message
         setSuccess(`Team "${teamName}" created successfully!`);
-        // Refresh the teams list after a short delay
+        // Pass team data to parent for optimistic update
+        onSuccess(response.team);
+        // Close modal after showing success toast for better UX
         setTimeout(() => {
-          onSuccess();
           onClose();
-        }, 1500);
+        }, 2000);
       }
     } catch (error) {
       console.error("Failed to create team:", error);

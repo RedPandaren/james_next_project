@@ -37,7 +37,7 @@ export const AlertFade = (
   };
 
   return (
-    <div className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+    <div className="fixed top-24 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
       <Alert
         variant={getVariant()}
         className="w-full max-w-md shadow-lg animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto"
