@@ -73,8 +73,8 @@ function LoginForm() {
       <div className="relative flex items-center justify-center w-full md:w-1/3 h-full p-4">
         {/* Floating Alerts */}
         <div className="absolute top-10 left-0 right-0 px-10 flex flex-col gap-2">
-          {error && AlertFade(error, true)}
-          {success && AlertFade(success)}
+          {error && AlertFade(error, "error")}
+          {success && AlertFade(success, "success")}
         </div>
 
         <Card className="w-full max-w-sm">

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import { createTeam } from "@/app/actions/teams";
+import { AlertFade } from "@/components/ui/reusable/alert";
 
 interface TeamCreateProps {
   onClose: () => void;
@@ -10,6 +11,15 @@ export default function TeamCreate({ onClose, onSuccess }: TeamCreateProps) {
   const [teamName, setTeamName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  // Auto-clear success message after 3 seconds
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,6 +27,7 @@ export default function TeamCreate({ onClose, onSuccess }: TeamCreateProps) {
 
     setLoading(true);
     setError(""); // Clear any previous errors
+    setSuccess(""); // Clear any previous success messages
 
     try {
       const response = await createTeam(teamName);
@@ -27,9 +38,13 @@ export default function TeamCreate({ onClose, onSuccess }: TeamCreateProps) {
       }
 
       if (response.success) {
-        // Team created successfully, refresh the teams list
-        onSuccess();
-        onClose();
+        // Team created successfully, show success message
+        setSuccess(`Team "${teamName}" created successfully!`);
+        // Refresh the teams list after a short delay
+        setTimeout(() => {
+          onSuccess();
+          onClose();
+        }, 1500);
       }
     } catch (error) {
       console.error("Failed to create team:", error);
@@ -45,6 +60,9 @@ export default function TeamCreate({ onClose, onSuccess }: TeamCreateProps) {
         className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
         onClick={onClose}
       />
+
+      {/* Success Notifications */}
+      {success && AlertFade(success, "success")}
 
       <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
         <div className="px-8 pt-8 pb-6 flex justify-between items-center">
